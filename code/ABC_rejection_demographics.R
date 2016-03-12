@@ -144,13 +144,50 @@ save(ABC_rejection_result, file = paste0(DestDir,"ABC_rejection_object.RData"))
 #             preprior = preprior,
 #             param.prior = simpact_prior)
 
-# Visualise distribution of features
-# stats <- ABC_rejection_result$stats[, c(1,2,18:ncol(ABC_rejection_result$stats))]
-# stats.df <- data.frame(rbind(sum_stat_obs, stats))
-# stats.df$target <- factor(c(1, rep(0, 8)))
-# 
-# pairs(x = stats.df[,1:12],
-#       col = stats.df$target)
+#####
+##### Visualise distribution of features
+#####
+stats <- ABC_rejection_result$stats[, c(1,2,18:ncol(ABC_rejection_result$stats))]
+stats.df <- data.frame(rbind(sum_stat_obs, stats))
+names(stats.df) <- c("Exp.Growth.rate",
+                     "Log.PTR",
+                     "Exp.hivprev",
+                     "Exp.aAG",
+                     "Exp.sdAG",
+                     "Exp.slope",
+                     "median.age.men",
+                     "median.age.women",
+                     "Exp.powercoeff",
+                     "Exp.wsdad",
+                     "Exp.bsdad",
+                     "Exp.concurr.pointprev")
+
+stats.df$target <- factor(c(1, rep(0, nrow(stats))))
+
+###
+# Now adding input parameters
+###
+param <- data.frame(rbind(rep(NA, 11), ABC_rejection_result$param))
+names(param) <- c("param.1",
+                  "param.2",
+                  "param.3",
+                  "param.4",
+                  "param.5",
+                  "param.6",
+                  "param.7",
+                  "param.8",
+                  "param.9",
+                  "param.10",
+                  "param.11")
+
+inputANDoutput.df <- cbind2(param, stats.df)
+save(inputANDoutput.df, file = paste0(DestDir,"inputANDoutput.1000.RData"))
+save(list=c("inputANDoutput.df", "simpact_prior", "targetSS"), file="inputANDoutput.1000.RData")
+
+pairs(x = stats.df[,1:12],
+      pch = 20,
+      cex = 0.5+2*as.numeric(as.character(stats.df$target)),
+      col = stats.df$target)
 
 
 ggscatmat(data = stats.df,
